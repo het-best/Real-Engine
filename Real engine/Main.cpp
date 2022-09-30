@@ -8,6 +8,7 @@ int set_title(std::string name);
 int set_cursor_visible(bool visisble);
 int draw_circle(sf::Color color, float size, int position[2]);
 int draw_polygon(sf::Color color, float size[255][2], int position[2]);
+int play_musick(std::string path);
 
 sf::ContextSettings settings;
 
@@ -17,24 +18,23 @@ sf::RenderWindow sfml_window(sf::VideoMode(1920, 1080), "Real engine", sf::Style
 
 int main()
 {
+    //ShowWindow(GetConsoleWindow(), SW_HIDE);
     log_add("Engine has been loaded!");
 
     sfml_window.setFramerateLimit(60);
     settings.antialiasingLevel = 8;
-    //ShowWindow(GetConsoleWindow(), SW_HIDE);
     set_cursor_visible(false);
+
     while (sfml_window.isOpen())
     {
         sf::Event event;
         while (sfml_window.pollEvent(event))
         {
-            // Закрываем окно если нажата кнопка закрытия
             if (event.type == sf::Event::Closed)
                 sfml_window.close();
 
             if (event.type == sf::Event::KeyPressed) 
             {
-                // обработка нажатия Escape
                 if (event.key.code == sf::Keyboard::Escape)
                 {
                     sfml_window.close();
@@ -42,9 +42,7 @@ int main()
             }
         }
 
-
-        int b[2] = { sf::Mouse::getPosition().x, sf::Mouse::getPosition().y };
-        draw_circle(sf::Color::Green,100.f , b);
+        sfml_window.clear(sf::Color::Green);
 
         sfml_window.display();
     }
@@ -125,6 +123,23 @@ int draw_polygon(sf::Color color, float size[255][2], int position[2])
         }
         shape.setFillColor(color);
         sfml_window.draw(shape);
+        return 0;
+    }
+    catch (char* error)
+    {
+        log_add(error);
+        return 1;
+    }
+}
+
+int play_music(std::string path)
+{
+    try
+    {
+        sf::Music music;
+        music.openFromFile(path);
+        music.play();
+        Sleep(music.getDuration().asMilliseconds());
         return 0;
     }
     catch (char* error)
