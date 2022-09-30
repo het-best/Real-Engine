@@ -4,10 +4,10 @@
 #include <iostream>
 
 int log_add(std::string log);
-int draw_circle(sf::Color color, float size, int position[2]);
-int draw_polygon(sf::Color color, float size[255][2], int position[2]);
 int set_title(std::string name);
 int set_cursor_visible(bool visisble);
+int draw_circle(sf::Color color, float size, int position[2]);
+int draw_polygon(sf::Color color, float size[255][2], int position[2]);
 
 sf::ContextSettings settings;
 
@@ -119,7 +119,7 @@ int draw_polygon(sf::Color color, float size[255][2], int position[2])
 
         sf::ConvexShape shape;
         shape.setPointCount(sizeof(size) - 3);
-        for (int i = 0; i < sizeof(size) - 3;i++)
+        for (int i = 0; i < 255;i++)
         {
             shape.setPoint(i, sf::Vector2f(size[i][0], size[i][1]));
         }
