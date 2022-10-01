@@ -21,8 +21,5 @@
           <p> play_music(path to music) - play music, use sf::Thread thread(&play_music, path to music); thread.launch();. </p>
       </div>
     </header>
-    <main>
-
-    </main>
   </body>
 </html>
