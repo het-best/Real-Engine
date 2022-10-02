@@ -4,25 +4,25 @@
 3 - Y
 4 - LB
 5 - RB
-6 - хз
-7 - Меню
-8 - Левый джойстик
-9 - Правый джойстик
+6 - View
+7 - Menu
+8 - Left stick
+9 - Right stick
 
-X < 0 - Лево
-X > 0 - Право
-Y < 0 - Вверх
-Y > 0 - Вниз
+X < 0 - Left stick left
+X > 0 - Left stick right
+Y < 0 - Left stick up
+Y > 0 - Left stick down
 
-U < 0 - Лево
-U > 0 - Право
-V < 0 - Вверх
-V > 0 - Вниз
+U < 0 - Right stick left
+U > 0 - Right stick right
+V < 0 - Right stick up
+V > 0 - Right stick down
 
-PovX < -0.5 - Кнопка влево
-PovX > 0.5 - Кнопка вправо
-PovY < -0.5 - Кнопка вниз
-PovY > 0.5 - Кнопка вверх
+PovX < -0.5 - Left button
+PovX > 0.5 - Right button
+PovY < -0.5 - Down button
+PovY > 0.5 - Up button
 
 Z > 0.5 - LT
 Z < -0.5 - RT
