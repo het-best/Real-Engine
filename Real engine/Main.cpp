@@ -1,23 +1,19 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
 #include <Windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream>
 #include <iostream>
-#include <fstream>
 
 void log_add(std::string log);
 int set_position(sf::Vector2i position);
 int set_size(sf::Vector2u size);
 int set_title(std::string name);
 int set_cursor_visible(bool visisble);
-int draw_text(sf::Color color, std::string path, std::string text, float size, sf::Text::Style type, sf::Text::Style type_two);
+int draw_text(sf::Color color, std::string path, std::string text, int size, sf::Text::Style type, sf::Text::Style type_two);
 int draw_circle(sf::Color color, float size, int position[2]);
-int draw_polygon(sf::Color color, float size[255][2], int position[2]);
+int draw_polygon(sf::Color color, float size[255][2], float position[2], int count);
 int play_sound(std::string path);
 int play_music(std::string path);
+int draw_cube(float position[2], float size);
 
 sf::RenderWindow sfml_window(sf::VideoMode(1920, 1080), "Real engine", sf::Style::Fullscreen);
 
@@ -26,9 +22,16 @@ sf::RenderWindow sfml_window(sf::VideoMode(1920, 1080), "Real engine", sf::Style
 int main()
 {
     sfml_window.setVerticalSyncEnabled(true);
-    //ShowWindow(GetConsoleWindow(), SW_HIDE);
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
     log_add("Engine has been loaded!");
 
+    sf::Shader shader;
+    shader.loadFromFile("Shader.frag", sf::Shader::Fragment);
+
+    auto shape = sf::RectangleShape{ sf::Vector2f{ sfml_window.getSize() } };
+
+    float time = 0;
+    sf::Clock clock;
     while (sfml_window.isOpen())
     {
         sf::Event event;
@@ -45,13 +48,59 @@ int main()
                 }
             }
         }
+        //draw_text(sf::Color::Black, "font.ttf", "Привет", 50.f, sf::Text::Bold, sf::Text::Regular);
 
-        sfml_window.clear(sf::Color::Green);
-
+        shader.setUniform("uTime", time);
+        shader.setUniform("uResolution", sf::Vector2f{ sfml_window.getSize() });
+        shader.setUniform("uMouse", sf::Vector2f{ float(sf::Mouse::getPosition().x), float(sf::Mouse::getPosition().y) });
+        sfml_window.clear();
+        sfml_window.draw(shape, &shader);
         sfml_window.display();
+        try 
+        {
+            time += 0.01;
+        }
+        catch(char* error)
+        {
+            time = 0;
+        }
     }
 
     return 0;
+}
+
+int draw_cube(float position[2], float size)
+{
+    try
+    {
+        float sizing[255][2] = {
+            {0.f * size, 0.f * size},
+            {100.f * size, 50.f * size},
+            {100.f * size, 150.f * size},
+            {0.f * size, 100.f * size}
+        };
+        draw_polygon(sf::Color(24, 24, 24), sizing, position, 4);
+        float sizing2[255][2] = {
+            {100.f * size, 50.f * size},
+            {200.f * size, 0.f * size},
+            {200.f * size, 100.f * size},
+            {100.f * size, 150.f * size}
+        };
+        draw_polygon(sf::Color::Black, sizing2, position, 4);
+        float sizing3[255][2] = {
+            {100.f * size, -50.f * size},
+            {200.f * size, 0.f * size},
+            {100.f * size, 50.f * size},
+            {0.f * size, 0.f * size}
+        };
+        draw_polygon(sf::Color(40, 40, 40), sizing3, position, 4);
+        return 0;
+    }
+    catch (char* error)
+    {
+        log_add(error);
+        return 1;
+    }
 }
 
 void log_add(std::string log)
@@ -115,7 +164,7 @@ int set_title(std::string name)
     }
 }
 
-int draw_text(sf::Color color, std::string path, std::string text, float size, sf::Text::Style type, sf::Text::Style type_two)
+int draw_text(sf::Color color, std::string path, std::string text, int size, sf::Text::Style type, sf::Text::Style type_two)
 {
     try
     {
@@ -156,13 +205,13 @@ int draw_circle(sf::Color color, float size, int position[2])
     }
 }
 
-int draw_polygon(sf::Color color, float size[255][2], int position[2])
+int draw_polygon(sf::Color color, float size[255][2], float position[2], int count)
 {
     try
     {
         float rec_size[255][2];
-        for (int i = 0; i < sizeof(size) - 3; i++) rec_size[i][0] = size[i][0];
-        for (int i = 0; i < sizeof(size) - 3; i++) rec_size[i][1] = size[i][1];
+        for (int i = 0; i < 255 - 3; i++) rec_size[i][0] = size[i][0];
+        for (int i = 0; i < 255 - 3; i++) rec_size[i][1] = size[i][1];
         size = new float[255][2];
         for (int i = 0; i < 255; i++)
         {
@@ -171,8 +220,8 @@ int draw_polygon(sf::Color color, float size[255][2], int position[2])
         }
 
         sf::ConvexShape shape;
-        shape.setPointCount(sizeof(size) - 3);
-        for (int i = 0; i < 255; i++)
+        shape.setPointCount(count);
+        for (int i = 0; i < count; i++)
         {
             shape.setPoint(i, sf::Vector2f(size[i][0], size[i][1]));
         }
