@@ -1,0 +1,1 @@
+window.set_title = 'z debil'

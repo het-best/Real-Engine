@@ -1,85 +1,8 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <Windows.h>
-#include <iostream>
-
-void log_add(std::string log);
-int set_position(sf::Vector2i position);
-int set_size(sf::Vector2u size);
-int set_title(sf::String name);
-int set_cursor_visible(bool visisble);
-int draw_text(sf::Color color, sf::String path, sf::String text, int size, int position[], sf::Text::Style type, sf::Text::Style type_two);
-int draw_circle(sf::Color color, float size, int position[2]);
-int draw_polygon(sf::Color color, float size[255][2], int position[2], int count);
-int play_sound(sf::String path);
-int play_music(sf::String path);
-int draw_cube(float position[2], float size);
-
-sf::RenderWindow sfml_window(sf::VideoMode(1920, 1080), "Real engine", sf::Style::Fullscreen);
-
-
-
-int main()
-{
-    sfml_window.setVerticalSyncEnabled(true);
-    //ShowWindow(GetConsoleWindow(), SW_HIDE);
-    log_add("Engine has been loaded!");
-
-    sf::Shader shader;
-    shader.loadFromFile("Shader.frag", sf::Shader::Fragment);
-
-    auto shape = sf::RectangleShape{ sf::Vector2f{ sfml_window.getSize() } };
-
-    float time = 0;
-    sf::Clock clock;
-    while (sfml_window.isOpen())
-    {
-        sf::Event event;
-        while (sfml_window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                sfml_window.close();
-
-            if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    sfml_window.close();
-                }
-            }
-        }
-		shader.setUniform("uTime", time);
+shader.setUniform("uTime", time);
 		shader.setUniform("uResolution", sf::Vector2f{ sfml_window.getSize() });
 		shader.setUniform("uMouse", sf::Vector2f{ float(sf::Mouse::getPosition().x), float(sf::Mouse::getPosition().y) });
-
 		sfml_window.clear();
-        /*
-        int position[] = { 100, 100 };
-
-        log_add("Test log");
-
-        set_cursor_visible(false);
-
-        set_position(sf::Vector2i{100, 100});
-
-        set_size(sf::Vector2u{ 1080, 720 });
-
-        set_title("Test name");
-
-        draw_text(sf::Color::Cyan, "test_font.ttf", "Test text", 50, position, sf::Text::Bold, sf::Text::Italic);
-
-        draw_circle(sf::Color::Magenta, 100.f, position);
-
-        float size[][2] = {
-            0.f, 0.f,
-            100.f, 100.f
-        };
-        draw_polygon(sf::Color::Yellow, size, position, 2);
-
-        play_music("music.ogg");
-        play_sound("sound.ogg");
-        */
-		sfml_window.draw(shape, &shader);
+		//sfml_window.draw(shape, &shader);
 		sfml_window.display();
 		try
 		{
@@ -155,7 +78,7 @@ int set_title(sf::String name)
     }
 }
 
-int draw_text(sf::Color color, sf::String path, sf::String text, int size, int position[], sf::Text::Style type, sf::Text::Style type_two)
+int draw_text(sf::Color color, sf::String path, sf::String text, int size, sf::Text::Style type, sf::Text::Style type_two)
 {
     try
     {
@@ -168,7 +91,6 @@ int draw_text(sf::Color color, sf::String path, sf::String text, int size, int p
         text_.setCharacterSize(size);
         text_.setFillColor(color);
         text_.setStyle(type | type_two);
-        text_.setPosition(position[0], position[1]);
 
         sfml_window.draw(text_);
         return 0;
@@ -197,7 +119,7 @@ int draw_circle(sf::Color color, float size, int position[2])
     }
 }
 
-int draw_polygon(sf::Color color, float size[255][2], int position[2], int count)
+int draw_polygon(sf::Color color, float size[255][2], float position[2], int count)
 {
     try
     {
@@ -263,3 +185,4 @@ int play_sound(sf::String path)
         return 1;
     }
 }
+

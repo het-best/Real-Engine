@@ -1,0 +1,11 @@
+C:\Users\hetbe\source\repos\Real engine\HScript\bin\Release\HScript.exe.config
+C:\Users\hetbe\source\repos\Real engine\HScript\bin\Release\HScript.exe
+C:\Users\hetbe\source\repos\Real engine\HScript\bin\Release\HScript.pdb
+C:\Users\hetbe\source\repos\Real engine\HScript\bin\Release\Newtonsoft.Json.dll
+C:\Users\hetbe\source\repos\Real engine\HScript\bin\Release\Newtonsoft.Json.xml
+C:\Users\hetbe\source\repos\Real engine\HScript\obj\Release\HScript.csproj.AssemblyReference.cache
+C:\Users\hetbe\source\repos\Real engine\HScript\obj\Release\HScript.csproj.SuggestedBindingRedirects.cache
+C:\Users\hetbe\source\repos\Real engine\HScript\obj\Release\HScript.csproj.CoreCompileInputs.cache
+C:\Users\hetbe\source\repos\Real engine\HScript\obj\Release\HScript.csproj.CopyComplete
+C:\Users\hetbe\source\repos\Real engine\HScript\obj\Release\HScript.exe
+C:\Users\hetbe\source\repos\Real engine\HScript\obj\Release\HScript.pdb
