@@ -18,8 +18,8 @@
       <p> draw_circle(sfml color, circle size, circle position) - draw circle. </p>
       <p> draw_text(text color, path to font, text, text size, text position, sf::Text::text type, sf::Text::text type) - draw text. </p>
       <p> draw_polygon(sfml color, polygon points, polygon position) - draw polygon. </p>
-      <p> play_music(path to music) - play music, use sf::Thread thread(&play_music, path to music);\n thread.launch();. </p>
-      <p> play_sound(path to sound) - play sound, use sf::Thread thread(&play_sound, path to sound);\n thread.launch();. </p>
+      <p> play_music(path to music) - play music, use sf::Thread thread(&play_music, path to music); thread.launch();. </p>
+      <p> play_sound(path to sound) - play sound, use sf::Thread thread(&play_sound, path to sound); thread.launch();. </p>
   </div>
 </header>
 <main>
