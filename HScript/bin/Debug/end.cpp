@@ -1,4 +1,4 @@
-shader.setUniform("uTime", time);
+        shader.setUniform("uTime", time);
 		shader.setUniform("uResolution", sf::Vector2f{ sfml_window.getSize() });
 		shader.setUniform("uMouse", sf::Vector2f{ float(sf::Mouse::getPosition().x), float(sf::Mouse::getPosition().y) });
 		sfml_window.clear();

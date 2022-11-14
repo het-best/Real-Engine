@@ -55,14 +55,18 @@ namespace HScript
             //начало
             if (settings[0] == "rus")
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Спасибо за использование HScript!!!");
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("Версия: " + settings[1]);
                 Console.WriteLine();
                 Console.WriteLine("Введите “help„ для помощи.");
             }
             else if (settings[0] == "eng")
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Thank for using HScript!!!");
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("Version: " + settings[1]);
                 Console.WriteLine();
                 Console.WriteLine("Enter “help„ for help.");
@@ -79,10 +83,14 @@ namespace HScript
                         if (settings[0] == "rus")
                         {
                             Console.WriteLine("“exit„ - выходит из программы.");
+                            Console.WriteLine("“set path„ - ввод пути к проекту.");
+                            Console.WriteLine("“compile„ - компилирует проект.");
                         }
                         else if (settings[0] == "eng")
                         {
                             Console.WriteLine("“exit„ - exit from programm.");
+                            Console.WriteLine("“set path„ - enter path to the project.");
+                            Console.WriteLine("“compile„ - compiles the project.");
                         }
                         break;
                     case "set path":
@@ -115,7 +123,39 @@ namespace HScript
                         else
                         {
                             compiler compiler = new compiler();
-                            compiler.compile(settings[2], user_name);
+                            compiler.compile(user_name, settings);
+                            //вывод названия
+                            using (StreamReader sr = new StreamReader("icon.txt"))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Magenta;
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    Console.WriteLine(sr.ReadLine());
+                                }
+                                sr.Close();
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.WriteLine();
+                            }
+
+                            //начало
+                            if (settings[0] == "rus")
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine("Спасибо за использование HScript!!!");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.WriteLine("Версия: " + settings[1]);
+                                Console.WriteLine();
+                                Console.WriteLine("Введите “help„ для помощи.");
+                            }
+                            else if (settings[0] == "eng")
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine("Thank for using HScript!!!");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.WriteLine("Version: " + settings[1]);
+                                Console.WriteLine();
+                                Console.WriteLine("Enter “help„ for help.");
+                            }
                         }
                         break;
                     case "exit":

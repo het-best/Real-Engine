@@ -19,4 +19,21 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Real engine.rc">
+      <Filter>Файлы ресурсов</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="x64\Debug\sfml-audio-d-2.dll" />
+    <None Include="x64\Debug\sfml-graphics-d-2.dll" />
+    <None Include="x64\Debug\sfml-network-d-2.dll" />
+    <None Include="x64\Debug\sfml-system-d-2.dll" />
+    <None Include="x64\Debug\sfml-window-d-2.dll" />
+  </ItemGroup>
 </Project>
