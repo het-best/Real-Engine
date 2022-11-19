@@ -2,7 +2,8 @@
   <div id="header" align="center">
     <h1> Open source voxel game engine by HetBest. </h1>
     <h1> Sourses: </h1>
-      <p> SFML </p>
+      <p> <a href="https://www.sfml-dev.org/"> SFML </p>
+      <p> Shader code by <a href="https://www.sfml-dev.org/"> Onigiri </p>
     <h1> How to use? </h1>
       <p> If you want to release your game you need to add to game folder sfml-window-d-2.dll, sfml-system-d-2.dll, sfml-graphics-d-2.dll and Shader.frag. </p>
       <p> If you use network or audio you need add sfml-network-d-2.dll or sfml-audio-d-2.dll and openal32.dll. </p>
