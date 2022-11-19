@@ -35,5 +35,6 @@
     <None Include="x64\Debug\sfml-network-d-2.dll" />
     <None Include="x64\Debug\sfml-system-d-2.dll" />
     <None Include="x64\Debug\sfml-window-d-2.dll" />
+    <None Include="x64\Debug\DLL.dll" />
   </ItemGroup>
 </Project>

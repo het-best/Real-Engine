@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
+
 void log_add(std::string log);
 int set_position(sf::Vector2i position);
 int set_size(sf::Vector2u size);
@@ -20,16 +21,99 @@ sf::RenderWindow sfml_window(sf::VideoMode(1920, 1080), "Real engine", sf::Style
 
 int main()
 {
+    bool focus = true;
     int mouse_position_int[2] = { sfml_window.getSize().x / 2, sfml_window.getSize().y / 2 };
     float mouse_position[2] = { 0, 0 };
     float mouse_sensitivity = 3.0f;
 
     bool keyboard_buttons[98] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+    bool joysticks_buttons[4][9] = {
+        false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false
+    };
+    bool joysticks_axes[4][7] = {
+        false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false
+    };
+    bool joysticks_connect[4] = { false, false, false, false };
 
     sf::Vector3f light_position = { -5.0f, 0.0f, 0.0f };
-    float max_distance = 9999.0f;
+
+    float max_distance = 100.0f;
+    float fov = 1.0;
     sf::Vector3f camera_position = sf::Vector3f(-5.0f, 0.0f, 0.0f);
-    float camera_speed = 1.1f;
+    float camera_speed = 0.15f;
+
+    sf::Vector3f objects[64] = {
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0),
+        sf::Vector3f(1.0, 2.0, 0.0)
+    };
 
     sfml_window.setVerticalSyncEnabled(true);
     //ShowWindow(GetConsoleWindow(), SW_HIDE);
@@ -42,6 +126,7 @@ int main()
     shader.loadFromFile("Shader.frag", sf::Shader::Fragment);
 
     sf::Clock game_time;
+    sf::Clock FPS;
 
     set_cursor_visible(false);
     log_add("Engine has been loaded!");
@@ -51,7 +136,15 @@ int main()
 		sf::Event event;
 		while (sfml_window.pollEvent(event))
 		{
-			if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::LostFocus)
+            {
+                focus = false;
+            }
+            else if (event.type == sf::Event::GainedFocus)
+            {
+                focus = true;
+            }
+			else if (event.type == sf::Event::Closed)
 			{
 				sfml_window.close();
 			}
@@ -169,11 +262,7 @@ int main()
 			}
             else if (event.type == sf::Event::KeyReleased)
             {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    sfml_window.close();
-                }
-                else if (event.key.code == sf::Keyboard::Unknown) keyboard_buttons[0] = false;
+                if (event.key.code == sf::Keyboard::Unknown) keyboard_buttons[0] = false;
                 else if (event.key.code == sf::Keyboard::Q) keyboard_buttons[1] = false;
                 else if (event.key.code == sf::Keyboard::W) keyboard_buttons[2] = false;
                 else if (event.key.code == sf::Keyboard::E) keyboard_buttons[3] = false;
@@ -273,34 +362,256 @@ int main()
                 else if (event.key.code == sf::Keyboard::Slash) keyboard_buttons[96] = false;
                 else if (event.key.code == sf::Keyboard::Backslash) keyboard_buttons[97] = false;
             }
+
+            else if (event.type == sf::Event::JoystickMoved) 
+            {
+                if (joysticks_connect[0])
+                {
+                    joysticks_axes[0][0] = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
+                    joysticks_axes[0][1] = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
+                    joysticks_axes[0][2] = sf::Joystick::getAxisPosition(0, sf::Joystick::U);
+                    joysticks_axes[0][3] = sf::Joystick::getAxisPosition(0, sf::Joystick::V);
+                    joysticks_axes[0][4] = sf::Joystick::getAxisPosition(0, sf::Joystick::PovX);
+                    joysticks_axes[0][5] = sf::Joystick::getAxisPosition(0, sf::Joystick::PovY);
+                    joysticks_axes[0][6] = sf::Joystick::getAxisPosition(0, sf::Joystick::Z);
+                }
+                else if (joysticks_connect[1])
+                {
+                    joysticks_axes[1][0] = sf::Joystick::getAxisPosition(1, sf::Joystick::X);
+                    joysticks_axes[1][1] = sf::Joystick::getAxisPosition(1, sf::Joystick::Y);
+                    joysticks_axes[1][2] = sf::Joystick::getAxisPosition(1, sf::Joystick::U);
+                    joysticks_axes[1][3] = sf::Joystick::getAxisPosition(1, sf::Joystick::V);
+                    joysticks_axes[1][4] = sf::Joystick::getAxisPosition(1, sf::Joystick::PovX);
+                    joysticks_axes[1][5] = sf::Joystick::getAxisPosition(1, sf::Joystick::PovY);
+                    joysticks_axes[1][6] = sf::Joystick::getAxisPosition(1, sf::Joystick::Z);
+                }
+                else if (joysticks_connect[2])
+                {
+                    joysticks_axes[2][0] = sf::Joystick::getAxisPosition(2, sf::Joystick::X);
+                    joysticks_axes[2][1] = sf::Joystick::getAxisPosition(2, sf::Joystick::Y);
+                    joysticks_axes[2][2] = sf::Joystick::getAxisPosition(2, sf::Joystick::U);
+                    joysticks_axes[2][3] = sf::Joystick::getAxisPosition(2, sf::Joystick::V);
+                    joysticks_axes[2][4] = sf::Joystick::getAxisPosition(2, sf::Joystick::PovX);
+                    joysticks_axes[2][5] = sf::Joystick::getAxisPosition(2, sf::Joystick::PovY);
+                    joysticks_axes[2][6] = sf::Joystick::getAxisPosition(2, sf::Joystick::Z);
+                }
+                else if (joysticks_connect[3])
+                {
+                    joysticks_axes[3][0] = sf::Joystick::getAxisPosition(3, sf::Joystick::X);
+                    joysticks_axes[3][1] = sf::Joystick::getAxisPosition(3, sf::Joystick::Y);
+                    joysticks_axes[3][2] = sf::Joystick::getAxisPosition(3, sf::Joystick::U);
+                    joysticks_axes[3][3] = sf::Joystick::getAxisPosition(3, sf::Joystick::V);
+                    joysticks_axes[3][4] = sf::Joystick::getAxisPosition(3, sf::Joystick::PovX);
+                    joysticks_axes[3][5] = sf::Joystick::getAxisPosition(3, sf::Joystick::PovY);
+                    joysticks_axes[3][6] = sf::Joystick::getAxisPosition(3, sf::Joystick::Z);
+                }
+            }
+            else if (event.type == sf::Event::JoystickButtonPressed)
+            {
+                if (joysticks_connect[0])
+                {
+                    if (sf::Joystick::isButtonPressed(0, 0)) { joysticks_buttons[0][0] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 1)) { joysticks_buttons[0][1] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 2)) { joysticks_buttons[0][2] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 3)) { joysticks_buttons[0][3] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 4)) { joysticks_buttons[0][4] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 5)) { joysticks_buttons[0][5] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 6)) { joysticks_buttons[0][6] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 7)) { joysticks_buttons[0][7] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 8)) { joysticks_buttons[0][8] = true; }
+                    else if (sf::Joystick::isButtonPressed(0, 9)) { joysticks_buttons[0][9] = true; }
+                }
+                if (joysticks_connect[1])
+                {
+                    if (sf::Joystick::isButtonPressed(1, 0)) { joysticks_buttons[1][0] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 1)) { joysticks_buttons[1][1] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 2)) { joysticks_buttons[1][2] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 3)) { joysticks_buttons[1][3] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 4)) { joysticks_buttons[1][4] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 5)) { joysticks_buttons[1][5] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 6)) { joysticks_buttons[1][6] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 7)) { joysticks_buttons[1][7] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 8)) { joysticks_buttons[1][8] = true; }
+                    else if (sf::Joystick::isButtonPressed(1, 9)) { joysticks_buttons[1][9] = true; }
+                }
+                if (joysticks_connect[2])
+                {
+                    if (sf::Joystick::isButtonPressed(2, 0)) { joysticks_buttons[2][0] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 1)) { joysticks_buttons[2][1] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 2)) { joysticks_buttons[2][2] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 3)) { joysticks_buttons[2][3] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 4)) { joysticks_buttons[2][4] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 5)) { joysticks_buttons[2][5] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 6)) { joysticks_buttons[2][6] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 7)) { joysticks_buttons[2][7] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 8)) { joysticks_buttons[2][8] = true; }
+                    else if (sf::Joystick::isButtonPressed(2, 9)) { joysticks_buttons[2][9] = true; }
+                }
+                if (joysticks_connect[3])
+                {
+                    if (sf::Joystick::isButtonPressed(3, 0)) { joysticks_buttons[3][0] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 1)) { joysticks_buttons[3][1] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 2)) { joysticks_buttons[3][2] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 3)) { joysticks_buttons[3][3] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 4)) { joysticks_buttons[3][4] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 5)) { joysticks_buttons[3][5] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 6)) { joysticks_buttons[3][6] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 7)) { joysticks_buttons[3][7] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 8)) { joysticks_buttons[3][8] = true; }
+                    else if (sf::Joystick::isButtonPressed(3, 9)) { joysticks_buttons[3][9] = true; }
+                }
+            }
+            else if (event.type == sf::Event::JoystickButtonReleased)
+            {
+                if (joysticks_connect[0])
+                {
+                    if (!sf::Joystick::isButtonPressed(0, 0)) { joysticks_buttons[0][0] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 1)) { joysticks_buttons[0][1] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 2)) { joysticks_buttons[0][2] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 3)) { joysticks_buttons[0][3] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 4)) { joysticks_buttons[0][4] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 5)) { joysticks_buttons[0][5] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 6)) { joysticks_buttons[0][6] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 7)) { joysticks_buttons[0][7] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 8)) { joysticks_buttons[0][8] = false; }
+                    if (!sf::Joystick::isButtonPressed(0, 9)) { joysticks_buttons[0][9] = false; }
+                }
+                if (joysticks_connect[1])
+                {
+                    if (!sf::Joystick::isButtonPressed(1, 0)) { joysticks_buttons[1][0] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 1)) { joysticks_buttons[1][1] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 2)) { joysticks_buttons[1][2] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 3)) { joysticks_buttons[1][3] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 4)) { joysticks_buttons[1][4] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 5)) { joysticks_buttons[1][5] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 6)) { joysticks_buttons[1][6] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 7)) { joysticks_buttons[1][7] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 8)) { joysticks_buttons[1][8] = false; }
+                    if (!sf::Joystick::isButtonPressed(1, 9)) { joysticks_buttons[1][9] = false; }
+                }
+                if (joysticks_connect[2])
+                {
+                    if (!sf::Joystick::isButtonPressed(2, 0)) { joysticks_buttons[2][0] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 1)) { joysticks_buttons[2][1] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 2)) { joysticks_buttons[2][2] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 3)) { joysticks_buttons[2][3] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 4)) { joysticks_buttons[2][4] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 5)) { joysticks_buttons[2][5] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 6)) { joysticks_buttons[2][6] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 7)) { joysticks_buttons[2][7] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 8)) { joysticks_buttons[2][8] = false; }
+                    if (!sf::Joystick::isButtonPressed(2, 9)) { joysticks_buttons[2][9] = false; }
+                }
+                if (joysticks_connect[3])
+                {
+                    if (!sf::Joystick::isButtonPressed(3, 0)) { joysticks_buttons[3][0] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 1)) { joysticks_buttons[3][1] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 2)) { joysticks_buttons[3][2] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 3)) { joysticks_buttons[3][3] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 4)) { joysticks_buttons[3][4] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 5)) { joysticks_buttons[3][5] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 6)) { joysticks_buttons[3][6] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 7)) { joysticks_buttons[3][7] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 8)) { joysticks_buttons[3][8] = false; }
+                    if (!sf::Joystick::isButtonPressed(3, 9)) { joysticks_buttons[3][9] = false; }
+                }
+            }
+            else if (event.type = sf::Event::JoystickConnected)
+            {
+                if (sf::Joystick::isConnected(0))
+                {
+                    joysticks_connect[0] = true;
+                }
+                if (sf::Joystick::isConnected(1))
+                {
+                    joysticks_connect[1] = true;
+                }
+                if (sf::Joystick::isConnected(2))
+                {
+                    joysticks_connect[2] = true;
+                }
+                if (sf::Joystick::isConnected(3))
+                {
+                    joysticks_connect[3] = true;
+                }
+            }
+            else if (event.type = sf::Event::JoystickDisconnected)
+            {
+                if (!sf::Joystick::isConnected(0))
+                {
+                    joysticks_connect[0] = false;
+                }
+                else if (!sf::Joystick::isConnected(1))
+                {
+                    joysticks_connect[1] = false;
+                }
+                else if (!sf::Joystick::isConnected(2))
+                {
+                    joysticks_connect[2] = false;
+                }
+                else if (!sf::Joystick::isConnected(3))
+                {
+                    joysticks_connect[3] = false;
+                }
+            }
 		}
-        mouse_position[0] = ((float)mouse_position_int[0] / sfml_window.getSize().x - 0.5f) * mouse_sensitivity;
-        mouse_position[1] = ((float)mouse_position_int[1] / sfml_window.getSize().y - 0.5f) * mouse_sensitivity;
-        sf::Vector3f dir = sf::Vector3f(0.0f, 0.0f, 0.0f);
-        sf::Vector3f dirTemp;
-        if (keyboard_buttons[2]) dir = sf::Vector3f(1.0f, 0.0f, 0.0f);
-        else if (keyboard_buttons[12]) dir = sf::Vector3f(-1.0f, 0.0f, 0.0f);
-        if (keyboard_buttons[11]) dir += sf::Vector3f(0.0f, -1.0f, 0.0f);
-        else if (keyboard_buttons[13]) dir += sf::Vector3f(0.0f, 1.0f, 0.0f);
-        dirTemp.z = dir.z * cos(-mouse_position[1]) - dir.x * sin(-mouse_position[1]);
-        dirTemp.x = dir.z * sin(-mouse_position[1]) + dir.x * cos(-mouse_position[1]);
-        dirTemp.y = dir.y;
-        dir.x = dirTemp.x * cos(mouse_position[0]) - dirTemp.y * sin(mouse_position[0]);
-        dir.y = dirTemp.x * sin(mouse_position[0]) + dirTemp.y * cos(mouse_position[0]);
-        dir.z = dirTemp.z;
-        camera_position += dir * camera_speed;
-        if (keyboard_buttons[84]) camera_position.z -= camera_speed;
-        else if (keyboard_buttons[48]) camera_position.z += camera_speed;
+        
+        if (focus)
+        {
+            mouse_position[0] = ((float)mouse_position_int[0] / sfml_window.getSize().x - 0.5f) * mouse_sensitivity;
+            mouse_position[1] = ((float)mouse_position_int[1] / sfml_window.getSize().y - 0.5f) * mouse_sensitivity;
+            sf::Vector3f dir = sf::Vector3f(0.0f, 0.0f, 0.0f);
+            sf::Vector3f dirTemp;
+            if (keyboard_buttons[2]) dir = sf::Vector3f(1.0f, 0.0f, 0.0f);
+            else if (keyboard_buttons[12]) dir = sf::Vector3f(-1.0f, 0.0f, 0.0f);
+            if (keyboard_buttons[11]) dir += sf::Vector3f(0.0f, -1.0f, 0.0f);
+            else if (keyboard_buttons[13]) dir += sf::Vector3f(0.0f, 1.0f, 0.0f);
+            dirTemp.z = dir.z * cos(-mouse_position[1]) - dir.x * sin(-mouse_position[1]);
+            dirTemp.x = dir.z * sin(-mouse_position[1]) + dir.x * cos(-mouse_position[1]);
+            dirTemp.y = dir.y;
+            dir.x = dirTemp.x * cos(mouse_position[0]) - dirTemp.y * sin(mouse_position[0]);
+            dir.y = dirTemp.x * sin(mouse_position[0]) + dirTemp.y * cos(mouse_position[0]);
+            dir.z = dirTemp.z;
+            camera_position += dir * camera_speed;
+            if (keyboard_buttons[84]) camera_position.z -= camera_speed;
+            else if (keyboard_buttons[48]) camera_position.z += camera_speed;
 
-        shader.setUniform("uResolution", sf::Vector2f(sfml_window.getSize().x, sfml_window.getSize().y));
-        shader.setUniform("uMouse", sf::Vector2f(mouse_position[0], mouse_position[1]));
-        shader.setUniform("uTime", game_time.getElapsedTime().asSeconds());
-        shader.setUniform("uMaxDistance", 99999.0f);
-        shader.setUniform("uCameraPosition", camera_position);
-        shader.setUniform("uLightPosition", sf::Vector3f(-0.5, 0.75, -1.0));
+            shader.setUniform("uResolution", sf::Vector2f(sfml_window.getSize().x, sfml_window.getSize().y));
+            shader.setUniform("uMouse", sf::Vector2f(mouse_position[0], mouse_position[1]));
+            shader.setUniform("uTime", game_time.getElapsedTime().asSeconds());
+            shader.setUniform("uMaxDistance", max_distance);
+            shader.setUniform("uFov", fov);
+            shader.setUniform("uCameraPosition", camera_position);
+            shader.setUniform("uLightPosition", sf::Vector3f(-0.5, 0.75, -1.0));
+            shader.setUniform("uObjects", objects);
 
-		sfml_window.draw(shader_placeholder, &shader);
-		sfml_window.display();
+            sfml_window.draw(shader_placeholder, &shader);
+            /*
+            int position[] = { 100, 100 };
+            log_add("Test log");
+            set_cursor_visible(false);
+            set_position(sf::Vector2i{100, 100});
+            set_size(sf::Vector2u{ 1080, 720 });
+            set_title("Test name");
+            draw_text(sf::Color::Cyan, "test_font.ttf", "Test text", 50, position, sf::Text::Bold, sf::Text::Italic);
+            draw_circle(sf::Color::Magenta, 100.f, position);
+            float size[][2] = {
+                0.f, 0.f,
+                100.f, 100.f
+            };
+            draw_polygon(sf::Color::Yellow, size, position, 2);
+            play_music("music.ogg");
+            play_sound("sound.ogg");
+            */
+            try
+            {
+                draw_text(sf::Color::Black, "test_font.ttf", std::to_string(1000 / FPS.getElapsedTime().asMilliseconds()), 50, sf::Text::Bold, sf::Text::Bold);
+            }
+            catch (char* error) {}
+            sfml_window.display();
+            FPS.restart();
+            Sleep(1);
+        }
 	}
 	return 0;
 }

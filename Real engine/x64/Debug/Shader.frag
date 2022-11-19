@@ -1,13 +1,17 @@
 #version 130
 
-
 //code by Onigiri https://github.com/ArtemOnigiri
 uniform vec2 uResolution;
 uniform vec2 uMouse;
 uniform float uTime;
+
 uniform float uMaxDistance;
+uniform float uFov;
 uniform vec3 uCameraPosition;
 uniform vec3 uLightPosition;
+
+uniform vec3 uObjects[64];
+
 vec3 LightPosition = normalize(uLightPosition);
 
 mat2 rot(float a) {
@@ -52,9 +56,10 @@ vec3 getSky(vec3 rd) {
 vec3 castRay(vec3 ro, vec3 rd) {
 	vec3 col;
 	vec2 minIt = vec2(uMaxDistance);
+	vec3 maxDistance = vec3(uMaxDistance);
 	vec2 it;
 	vec3 n;
-	vec3 spherePos = vec3(0.0, -1.0, 0.0);
+	vec3 spherePos = vec3(-10.0, -1.0, 0.0);
 	it = sphIntersect(ro - spherePos, rd, 1.0);
 	if(it.x > 0.0 && it.x < minIt.x) {
 		minIt = it;
@@ -62,14 +67,16 @@ vec3 castRay(vec3 ro, vec3 rd) {
 		n = itPos - spherePos;
 		col = vec3(1.0, 0.2, 0.1);
 	}
-	for(int i=0;i<100;++i) {
+	for(int i=0;i<4;++i) {
 		vec3 boxN;
-		vec3 boxPos = vec3(1.0, i * 2, -i * 2);
-		it = boxIntersection(ro - boxPos, rd, vec3(1.0), boxN);
-		if(it.x > 0.0 && it.x < minIt.x) {
-			minIt = it;
-			n = boxN;
-			col = vec3(0.4, 0.6, 0.8);
+		vec3 boxPos = vec3(1, i * 2, 0);
+		if (boxPos.x < uCameraPosition.x + maxDistance.x && boxPos.y < uCameraPosition.y + maxDistance.y && boxPos.z < uCameraPosition.z + maxDistance.z) {
+			it = boxIntersection(ro - boxPos, rd, vec3(1.0), boxN);
+			if(it.x > 0.0 && it.x < minIt.x) {
+				minIt = it;
+				n = boxN;
+				col = vec3(1.000, 0.730, 0.624);
+			}
 		}
 	}
 	vec3 planeNormal = vec3(0.0, 0.0, -1.0);
@@ -92,16 +99,13 @@ vec3 traceRay(vec3 ro, vec3 rd) {
 	vec3 col = castRay(ro, rd);
 	if(col.x == -1.0) return getSky(rd);
 	vec3 LightDir = LightPosition;
-	if(dot(rd, LightPosition) > 0) {
-		if(castRay(ro, LightDir).x != -1.0) col *= 0.0;
-	}
 	return col;
 }
 
 void main() {
 	vec2 uv = (gl_TexCoord[0].xy - 0.5) * uResolution / uResolution.y;
 	vec3 rayOrigin = uCameraPosition;
-	vec3 rayDirection = normalize(vec3(1.0, uv));
+	vec3 rayDirection = normalize(vec3(1.0, uv * uFov));
 	rayDirection.zx *= rot(-uMouse.y);
 	rayDirection.xy *= rot(uMouse.x);
 	vec3 col = traceRay(rayOrigin, rayDirection);

@@ -1,0 +1,6 @@
+﻿  ANDROID_HOME=D:\\Microsoft\AndroidSDK\25
+  ANT_HOME=D:\Program Files\Microsoft Visual Studio\Base\Apps\apache-ant-1.9.3
+  JAVA_HOME=C:\Program Files\Android\jdk\jdk-8.0.302.8-hotspot\jdk8u302-b08
+  NDK_ROOT=D:\\Microsoft\AndroidNDK\android-ndk-r21e
+  Cube.c
+  MobileDevices.Android.NativeActivity.vcxproj -> C:\Users\hetbe\source\repos\Real engine\MobileDevices\ARM\Debug\libMobileDevices.so
