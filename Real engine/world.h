@@ -2,33 +2,47 @@
 
 namespace game_world {
 
-    float max_distance = 128.0f;
+    sf::Vector3f objects_position[65535];
 
-    sf::Vector3f camera_position = { 5.0f, 0.0f, 0.0f };
+    sf::Vector3f objects_color[65535];
 
-    sf::Vector3f camera_rotation = { 0.0f, 0.0f, 0.0f };
-    sf::Vector2f camera_degrees = { 0.0f, 0.0f };
+    sf::Vector3f objects_rotation[65535];
 
-    float camera_speed = 0.15f;
+    sf::Int16 objects_weight[65535];
 
-    float camera_fov = 80.0f;
+    sf::Int16 objects_strength[65535];
 
-    float camera_sensitivity = 0.9f;
-    float camera_accuracy = 15.0f;
+    sf::Int16 objects_visible[65535];
+
+    bool objects_destroyed[65535];
+
+    int objects_count = 0;
+
+    class attraction_point
+    {
+    public:
+        sf::Vector3f position = sf::Vector3f();
+        float strength = 1.0;
+    };
 
     class object
     {
     public:
-        sf::Vector3f *voxels_position = new sf::Vector3f[65535];
-        sf::Vector3f *voxels_color = new sf::Vector3f[65535];
-        sf::Vector3f *voxels_rotation = new sf::Vector3f[65535];
-        sf::Int16*voxels_weight = new sf::Int16[65535];
-        sf::Int16*voxels_strength = new sf::Int16[65535];
-        sf::Int16*voxels_visible = new sf::Int16[65535];
+        sf::Vector3f* voxels_position = new sf::Vector3f[65535];
+        sf::Vector3f* voxels_color = new sf::Vector3f[65535];
+        sf::Vector3f* voxels_rotation = new sf::Vector3f[65535];
+        sf::Vector3f* voxels_attraction_direction = new sf::Vector3f[65535];
+
+        sf::Int16* voxels_strength = new sf::Int16[65535];
+        sf::Int16* voxels_visible = new sf::Int16[65535];
+
         bool* voxels_destroyed = new bool[65535];
+        float* voxels_weight = new float[65535];
+        int voxels_count = 0;
+
         void destroy_object()
         {
-            for (int i = 0; i < sizeof(voxels_destroyed) / 12; i++)
+            for (int i = 0; i < voxels_count; i++)
             {
                 voxels_destroyed[i] = true;
             }
@@ -43,83 +57,147 @@ namespace game_world {
             voxels_visible[voxel_count] = voxel_visible;
             voxels_destroyed[voxel_count] = false;
         }
-        sf::Vector3f* get_voxels_position()
+
+        int update_objects(int count)
         {
-            return voxels_position;
-        }
-        sf::Vector3f* get_voxels_color()
-        {
-            return voxels_color;
-        }
-        sf::Vector3f* get_voxels_rotation()
-        {
-            return voxels_rotation;
-        }
-        sf::Int16* get_voxels_weight()
-        {
-            return voxels_weight;
-        }
-        sf::Int16* get_voxels_strength()
-        {
-            return voxels_strength;
-        }
-        sf::Int16* get_voxels_visible()
-        {
-            return voxels_visible;
-        }
-        bool* get_voxels_destroyed()
-        {
-            return voxels_destroyed;
+            voxels_count = 0;
+            for (int i = 0; i < sizeof(objects_position) / 12 - count; i++) 
+            {
+                if (voxels_position[i] != sf::Vector3f())
+                {
+                    objects_position[i] = voxels_position[i];
+                    objects_color[i] = voxels_color[i];
+                    objects_rotation[i] = voxels_rotation[i];
+                    objects_weight[i] = voxels_weight[i];
+                    objects_strength[i] = voxels_strength[i];
+                    objects_visible[i] = voxels_visible[i];
+                    objects_destroyed[i] = voxels_destroyed[i];
+                    objects_count++; 
+                    voxels_count++;
+                }
+                else
+                {
+                    i = sizeof(objects_position);
+                }
+
+            }
+            return count;
         }
 
+        void calculate_object_physics(attraction_point attraction)
+        {
+            for (int i = 0; i < voxels_count; i++)
+            {
+                if (voxels_weight[i] != 0)
+                {
+                    sf::Vector3f direction = attraction.position - voxels_position[i];
+                    float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
+
+                    direction /= distance;
+                    float force = attraction.strength * voxels_weight[i];
+
+                    voxels_attraction_direction[i] += force * direction;
+
+                    float angle = distance * 10.0;
+
+                    voxels_rotation[i] = direction * angle;
+
+                    voxels_position[i] += voxels_attraction_direction[i];
+                }
+            }
+        }
     };
+
+    class camera
+    {
+    public:
+        sf::Vector3f position = sf::Vector3f();
+
+        sf::Vector3f rotation = sf::Vector3f();
+        sf::Vector2f degrees = sf::Vector2f();
+
+        glm::vec3 direction = glm::vec3();
+        glm::vec3 right = glm::vec3();
+        glm::vec3 up = glm::vec3();
+
+        sf::Vector3f attraction_direction = sf::Vector3f();
+
+        float weight = 1.0;
+
+        float max_distance = 128.0;
+        float speed = 0.15;
+
+        float fov = 90.0;
+
+        float sensitivity = 0.9;
+
+        void set(sf::Vector3f pos = sf::Vector3f(), sf::Vector3f rot = sf::Vector3f(), float weight = 0.1)
+        {
+            position = pos;
+            rotation = rot;
+        }
+
+        void degrees_into_point()
+        {
+            direction = {
+                cos(degrees.y) * sin(degrees.x),
+                sin(degrees.y),
+                cos(degrees.y) * cos(degrees.x)
+            };
+
+            right = {
+                sin(degrees.x - 3.14f / 2.0),
+                0,
+                cos(degrees.x - 3.14f / 2.0)
+            };
+
+            up = glm::cross(right, direction);
+
+            direction *= sensitivity;
+            right *= sensitivity;
+        }
+
+        void calculate_camera_physics(attraction_point attraction)
+        {
+            sf::Vector3f direction = attraction.position - position;
+            float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
+
+            direction /= distance;
+            float force = attraction.strength * weight;
+
+            attraction_direction += force * direction;
+
+            float angle = distance * 10.0;
+
+            rotation = direction * angle;
+
+            position += attraction_direction;
+        }
+    };
+
+    camera current_camera;
 
     object obj;
+    camera cam;
 
-    sf::Vector3f objects_position[] = {
-        sf::Vector3f(0, 0, 0),
-        sf::Vector3f(0, 0, 0),
-    };
-
-    sf::Vector3f objects_color[] = {
-        sf::Vector3f(0, 0, 0),
-        sf::Vector3f(0, 0, 0),
-    };
-
-    sf::Vector3f objects_rotation[] = {
-        sf::Vector3f(0, 0, 0),
-        sf::Vector3f(0, 0, 0),
-    };
-
-    sf::Int16 objects_weight[] = {
-        0,
-        0,
-    };
-
-    sf::Int16 objects_strength[] = {
-        -1,
-        -1,
-    };
-
-    sf::Int16 objects_visible[] = {
-        256,
-        256,
-    };
-
-    bool objects_destroyed[] = {
-        false,
-        false,
-    };
+    attraction_point att;
 
     void initialization_objects()
     {
-        obj.set_voxel(0, sf::Vector3f(0, 0, 1), sf::Vector3f(1.0, 0.8, 0.1058824), sf::Vector3f(0, 0, 0), 0, -1, 256);
-        obj.set_voxel(1, sf::Vector3f(-2, 0, 1), sf::Vector3f(0.8, 0.4784314, 0.03921569), sf::Vector3f(0, 0, 0), 0, -1, 256);
+        obj.set_voxel(0, sf::Vector3f(2, -4, 1), sf::Vector3f(1.0, 0.8, 0.1058824), sf::Vector3f(0, 0, 0), 0, -1, 256);
+        obj.set_voxel(1, sf::Vector3f(5, 5, 5), sf::Vector3f(0.8, 0.4784314, 0.03921569), sf::Vector3f(0, 0, 0), 1, -1, 256);
+        obj.set_voxel(2, sf::Vector3f(-5, -5, -5), sf::Vector3f(0.8, 0.14, 0), sf::Vector3f(0, 0, 0), 3, -1, 256);
+        obj.set_voxel(3, sf::Vector3f(2, 8, 15), sf::Vector3f(0.81960784, 0.6039215, 0.60392156), sf::Vector3f(0, 0, 0), 1.5, -1, 256);
+        obj.set_voxel(4, sf::Vector3f(-12, 1, -2), sf::Vector3f(0.1960784, 0.5450980, 0.6), sf::Vector3f(0, 0, 0), 2, -1, 256);
+
+        att.position = sf::Vector3f(2, -4, 1);
+        att.strength = 0.01;
     }
 
     void clear_objects()
     {
-        for (int i = 0; i < sizeof(objects_position) / 12; i++)
+        objects_count = 0;
+        for (int i = 0; i < objects_count; i++)
         {
             objects_position[i] = sf::Vector3f();
             objects_color[i] = sf::Vector3f();
@@ -129,17 +207,5 @@ namespace game_world {
             objects_visible[i] = NULL;
             objects_destroyed[i] = NULL;
         }
-    }
-
-    int update_objects(object& object_, int count)
-    {
-        for (int i = 0; i < sizeof(objects_position) / 12 - count; i++) { objects_position[i] = object_.get_voxels_position()[i]; }
-        for (int i = 0; i < sizeof(objects_color) / 12 - count; i++) { objects_color[i] = object_.get_voxels_color()[i]; }
-        for (int i = 0; i < sizeof(objects_rotation) / 12 - count; i++) { objects_rotation[i] = object_.get_voxels_rotation()[i]; }
-        for (int i = 0; i < sizeof(objects_weight) / 12 - count; i++) { objects_weight[i] = object_.get_voxels_weight()[i]; }
-        for (int i = 0; i < sizeof(objects_strength) / 12 - count; i++) { objects_strength[i] = object_.get_voxels_strength()[i]; }
-        for (int i = 0; i < sizeof(objects_visible) / 12 - count; i++) { objects_visible[i] = object_.get_voxels_visible()[i]; }
-        for (int i = 0; i < sizeof(objects_destroyed) / 12 - count; i++) { objects_destroyed[i] = object_.get_voxels_destroyed()[i]; }
-        return count;
     }
 }

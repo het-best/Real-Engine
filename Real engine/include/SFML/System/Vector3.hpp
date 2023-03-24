@@ -247,7 +247,10 @@ bool operator ==(const Vector3<T>& left, const Vector3<T>& right);
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-bool operator !=(const Vector3<T>& left, const Vector3<T>& right);
+bool operator !=(const Vector3<T>& left, const Vector3<T>& right)
+{
+    return (left.x != right.x) || (left.y != right.y) || (left.z != right.z);
+}
 
 #include <SFML/System/Vector3.inl>
 

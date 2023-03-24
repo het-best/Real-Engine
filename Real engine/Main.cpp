@@ -3,6 +3,10 @@
 #include <windows.h>
 #include <iostream>
 #include <cmath>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
 
 //SFML
 #include <SFML/Window.hpp>
@@ -16,10 +20,7 @@
 #include "sha256.h"
 
 //GLM
-#include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/geometric.hpp>
 
 //SFML LIBRARIES
 #include <SFML/Libraries/Cornered/RoundRect.cpp>
@@ -53,7 +54,6 @@ int main()
 {
     //VARIABLE FOR FOCUS
     bool focus = true;
-    bool first_frame = true;
 
     //ACTIVATE WINDOW
     sfml_window.setActive(true);
@@ -65,8 +65,6 @@ int main()
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_COLOR_MATERIAL);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_ONE, GL_ONE);
 
     //glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -74,9 +72,17 @@ int main()
     //INITIALIZATION OBJECTS
     game_world::initialization_objects();
 
+    auto image = sf::Image{};
+    if (!image.loadFromFile(config::window_icon)) { log_add("ERROR TO LOAD FILE"); }
+
+    sfml_window.setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
+
     //CLOCKS
     sf::Clock game_time;
     sf::Clock FPS;
+
+    sf::Event event;
+    while (sfml_window.pollEvent(event)) { sf::Mouse::setPosition(sf::Vector2i(config::window_resolution.x / 2, config::window_resolution.y / 2), sfml_window); }
 
     //MAIN CYCLE
     while (sfml_window.isOpen())
@@ -110,110 +116,92 @@ int main()
                 sf::Mouse::setPosition(sf::Vector2i(config::window_resolution.x / 2, config::window_resolution.y / 2), sfml_window);
             }
         }
-        if (first_frame) 
-        {
-            game_input::mouse_position.x = 0;
-            game_input::mouse_position.y = 0;
-            first_frame = false;
-        }
-
         if (focus)
         {
             //CLEARING BUFFERS
             //sfml_window.clear();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-            //CLEARING AND UPDATE OBJECTS
+            //CLEARING OBJECTS
             game_world::clear_objects();
-            int count = game_world::update_objects(game_world::obj, 0);
 
-            //CHANGE MATRIX
+            //CLEAR MATRIX
             glLoadIdentity();
 
             //CHANGE CAMERA POSITION AND ROTAION 
-            game_world::camera_degrees.x = -((float)game_input::mouse_position.x / config::window_resolution.x * 360 * game_world::camera_sensitivity / 50);
-            game_world::camera_degrees.y = -((float)game_input::mouse_position.y / config::window_resolution.y * 360.0 * game_world::camera_sensitivity / 50);
+            game_world::cam.degrees.x = -((float)game_input::mouse_position.x / config::window_resolution.x * 360 * game_world::cam.sensitivity / 50);
+            game_world::cam.degrees.y = -((float)game_input::mouse_position.y / config::window_resolution.y * 360 * game_world::cam.sensitivity / 50);
 
             //CONVERTING THE DEGREES OF THE CAMERA INTO A POINT WHERE TO LOOK
-            glm::vec3 camera_direction = {
-                cos(game_world::camera_degrees.y) * sin(game_world::camera_degrees.x),
-                sin(game_world::camera_degrees.y),
-                cos(game_world::camera_degrees.y) * cos(game_world::camera_degrees.x)
-            };
-
-            glm::vec3 camera_right = {
-                sin(game_world::camera_degrees.x - 3.14f / 2.0f),
-                0,
-                cos(game_world::camera_degrees.x - 3.14f / 2.0f)
-            };
-
-            glm::vec3 camera_up = glm::cross(camera_right, camera_direction);
-
-            camera_direction /= game_world::camera_accuracy;
-            camera_right /= game_world::camera_accuracy;
+            //game_world::cam.calculate_camera_physics(game_world::att);
+            game_world::cam.degrees_into_point();
 
             //MOVING
             if (game_input::is_key_pressed(sf::Keyboard::W))
             {
-                game_world::camera_position.x += camera_direction.x;
-                game_world::camera_position.y += camera_direction.y;
-                game_world::camera_position.z += camera_direction.z;
+                game_world::cam.position.x += game_world::cam.direction.x;
+                game_world::cam.position.y += game_world::cam.direction.y;
+                game_world::cam.position.z += game_world::cam.direction.z;
             }
             if (game_input::is_key_pressed(sf::Keyboard::S))
             {
-                game_world::camera_position.x -= camera_direction.x;
-                game_world::camera_position.y -= camera_direction.y;
-                game_world::camera_position.z -= camera_direction.z;
+                game_world::cam.position.x -= game_world::cam.direction.x;
+                game_world::cam.position.y -= game_world::cam.direction.y;
+                game_world::cam.position.z -= game_world::cam.direction.z;
             }
             if (game_input::is_key_pressed(sf::Keyboard::A))
             {
-                game_world::camera_position.x -= camera_right.x;
-                game_world::camera_position.y -= camera_right.y;
-                game_world::camera_position.z -= camera_right.z;
+                game_world::cam.position.x -= game_world::cam.right.x;
+                game_world::cam.position.y -= game_world::cam.right.y;
+                game_world::cam.position.z -= game_world::cam.right.z;
             }
             if (game_input::is_key_pressed(sf::Keyboard::D))
             {
-                game_world::camera_position.x += camera_right.x;
-                game_world::camera_position.y += camera_right.y;
-                game_world::camera_position.z += camera_right.z;
+                game_world::cam.position.x += game_world::cam.right.x;
+                game_world::cam.position.y += game_world::cam.right.y;
+                game_world::cam.position.z += game_world::cam.right.z;
             }
 
             if (game_input::is_key_pressed(sf::Keyboard::Space))
             {
-                game_world::camera_position.y += game_world::camera_speed;
+                game_world::cam.position.y += game_world::cam.speed;
             }
             if (game_input::is_key_pressed(sf::Keyboard::LShift))
             {
-                game_world::camera_position.y -= game_world::camera_speed;
+                game_world::cam.position.y -= game_world::cam.speed;
             }
 
             //CONVERTING THE DEGREES OF THE CAMERA INTO A POINT WHERE TO LOOK
-            game_world::camera_rotation = { game_world::camera_position.x + camera_direction.x, game_world::camera_position.y + camera_direction.y, game_world::camera_position.z + camera_direction.z };
+            game_world::cam.rotation = { game_world::cam.position.x + game_world::cam.direction.x, game_world::cam.position.y + game_world::cam.direction.y, game_world::cam.position.z + game_world::cam.direction.z };
+
+            game_world::current_camera = game_world::cam;
 
             //APPLY CAMERA POSITION, ROTAION AND PERSPECTIVE
-            //glFrustum(-1.0, 2.5, -1.0, 1.0, 1.5, game_world::max_distance);
-            gluPerspective(80, 16.0f / 9.0f, 0.01f, game_world::max_distance);
+            gluPerspective(game_world::current_camera.fov, (float)config::window_resolution.x / (float)config::window_resolution.y, 0.01, game_world::current_camera.max_distance);
             gluLookAt(
-                game_world::camera_position.x, game_world::camera_position.y, game_world::camera_position.z,
-                game_world::camera_rotation.x, game_world::camera_rotation.y, game_world::camera_rotation.z,
-                camera_up.x, camera_up.y, camera_up.z);
+                game_world::current_camera.position.x, game_world::current_camera.position.y, game_world::current_camera.position.z,
+                game_world::current_camera.rotation.x, game_world::current_camera.rotation.y, game_world::current_camera.rotation.z,
+                game_world::current_camera.up.x, game_world::current_camera.up.y, game_world::current_camera.up.z);
 
             //DRAWING VOXELS
-            for (int i = 0; i < sizeof(game_world::objects_position) / 12; i++)
+            game_world::obj.calculate_object_physics(game_world::att);
+            int count = game_world::obj.update_objects(0);
+            //game_world::att.strength = game_time.getElapsedTime().asSeconds() / 100.0;
+            //game_world::att.position.x += game_time.getElapsedTime().asSeconds() / 100.0;
+
+            for (int i = 0; i < game_world::objects_count; i++)
             {
                 if (game_world::objects_position[i] != sf::Vector3f())
                 {
-                    glRotatef(game_world::objects_rotation[i].x, 1.0f, 0.0f, 0.0f);
-                    glRotatef(game_world::objects_rotation[i].y, 0.0f, 1.0f, 0.0f);
-                    glRotatef(game_world::objects_rotation[i].z, 0.0f, 0.0f, 1.0f);
+                    glPushMatrix();
                     glTranslatef(game_world::objects_position[i].x, game_world::objects_position[i].y, game_world::objects_position[i].z);
+                    glRotatef(game_world::objects_rotation[i].x, 1, 0, 0);
+                    glRotatef(game_world::objects_rotation[i].y, 0, 1, 0);
+                    glRotatef(game_world::objects_rotation[i].z, 0, 0, 1);
 
-                    draw_cube(1.0f, game_world::objects_color[i], game_world::objects_visible[i]);
+                    draw_cube(1.0, game_world::objects_color[i], game_world::objects_visible[i]);
 
-                    glRotatef(-game_world::objects_rotation[i].x, -1.0f, 0.0f, 0.0f);
-                    glRotatef(-game_world::objects_rotation[i].y, 0.0f, -1.0f, 0.0f);
-                    glRotatef(-game_world::objects_rotation[i].z, 0.0f, 0.0f, -1.0f);
-                    glTranslatef(-game_world::objects_position[i].x, -game_world::objects_position[i].y, -game_world::objects_position[i].z);
+                    glPopMatrix();
                 }
             }
 
@@ -225,7 +213,6 @@ int main()
 
             sfml_window.popGLStates();
 
-            //RENDER SCHENE
             sfml_window.display();
         }
     }
@@ -430,7 +417,7 @@ int draw_cube(float size, sf::Vector3f color, sf::Int16 transparency)
 {
     try
     {
-        glColor4f(color.x, color.y, color.z, transparency / 256);
+        glColor4f(color.x, color.y, color.z, transparency / 256.0);
 
         glBegin(GL_QUADS);
 
@@ -490,7 +477,7 @@ int draw_light(sf::Vector3f position, sf::Vector3f direction, sf::Vector3f color
 
         glLightfv(GL_LIGHT0, GL_POSITION, pos);
         glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, dir);
-        glLightfv(GL_LIGHT3, GL_DIFFUSE, col);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, col);
         return 0;
     }
     catch (char* error)

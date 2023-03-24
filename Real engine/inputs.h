@@ -29,7 +29,24 @@ namespace game_input {
 	{
 		if (sf::Joystick::isConnected(number))
 		{
-			return true;
+			return sf::Joystick::getButtonCount(number);
+		}
+		return false;
+	}
+
+	bool is_joystick_button_pressed(int number, int button)
+	{
+		if (sf::Joystick::isConnected(number))
+		{
+			return sf::Joystick::isButtonPressed(number, button);
+		}
+		return false;
+	}
+	int get_joystick_axis(int number, sf::Joystick::Axis axis)
+	{
+		if (sf::Joystick::isConnected(number))
+		{
+			return sf::Joystick::getAxisPosition(number, axis);
 		}
 		return false;
 	}

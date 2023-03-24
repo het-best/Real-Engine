@@ -22,6 +22,8 @@
 //
 ////////////////////////////////////////////////////////////
 
+using namespace sf;
+
 namespace priv
 {
 // Base class for abstract thread functions

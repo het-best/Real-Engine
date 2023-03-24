@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-using namespace sf;
+using sf::Vector3;
 
 ////////////////////////////////////////////////////////////
 template <typename T>
@@ -158,12 +158,4 @@ template <typename T>
 inline bool operator ==(const Vector3<T>& left, const Vector3<T>& right)
 {
     return (left.x == right.x) && (left.y == right.y) && (left.z == right.z);
-}
-
-
-////////////////////////////////////////////////////////////
-template <typename T>
-inline bool operator !=(const Vector3<T>& left, const Vector3<T>& right)
-{
-    return (left.x != right.x) || (left.y != right.y) || (left.z != right.z);
 }
