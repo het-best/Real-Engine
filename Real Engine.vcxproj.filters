@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="CODE">
+      <UniqueIdentifier>{aea11e0b-e7e8-48c4-b2ca-7f47e661fff1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HEADERS">
+      <UniqueIdentifier>{39e4c64b-81d5-4aa3-bf4e-06389cdd9fef}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CODE\MAIN.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\MODEL.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\MAIN_CYCLE.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\CONFIG.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\RENDERING.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\CAMERA.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\INPUT.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\FILE.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\MATH.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\DEBUGGING.cpp">
+      <Filter>CODE</Filter>
+    </ClCompile>
+    <ClCompile Include="CODE\CONFIG.hpp">
+      <Filter>HEADERS</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CODE\RENDERING.hpp">
+      <Filter>HEADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="CODE\MODEL.hpp">
+      <Filter>HEADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="CODE\MATH.hpp">
+      <Filter>HEADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="CODE\INPUT.hpp">
+      <Filter>HEADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="CODE\FILE.hpp">
+      <Filter>HEADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="CODE\CAMERA.hpp">
+      <Filter>HEADERS</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
