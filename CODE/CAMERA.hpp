@@ -29,7 +29,7 @@ namespace ENGINE_CAMERA {
 
         void update(int delta_time);
 
-        fps_camera(Vector3f position_, float render_distance_ = 256, float speed_ = 25, float jump_speed_ = 1, float fov_ = 60.0, float rotation_sensitivity_ = 0.9);
+        fps_camera(Vector3f position_, float render_distance_ = 256, float speed_ = 25, float jump_speed_ = 10, float fov_ = 60.0, float rotation_sensitivity_ = 0.9);
     };
 }
 

@@ -8,21 +8,10 @@
 
 namespace ENGINE_MAIN_CYCLE
 {
-    bool is_touching_floor = false;
-
     void close(string game_time, int code)
     {
         ENGINE_FILE::save_in_log("exit.log", "Current game time: " + game_time + "s");
         exit(code);
-    }
-
-    void on_player_collision(ENGINE_MODEL::collision*, ENGINE_MODEL::collision*)
-    {
-        is_touching_floor = true;
-    }
-    void on_no_player_collision()
-    {
-        is_touching_floor = false;
     }
 
 	int MAIN_CYCLE()
@@ -43,12 +32,8 @@ namespace ENGINE_MAIN_CYCLE
 
         //LOAD GAME DATA
         ENGINE_CAMERA::fps_camera camera(Vector3f(0, 0, 0));
-        ENGINE_MODEL::polygon_model pmod(ENGINE_MODEL::model("platform.vox"));
-        //ENGINE_MODEL::polygon_models.push_back(&pmod);
-        ENGINE_MODEL::collision player_col(Vector3f(-1, -2, -1), Vector3f(1, 2, 1), Color(114, 186, 169, 86));
-        player_col.on_collision = on_player_collision;
-        player_col.on_no_collision = on_no_player_collision;
-        ENGINE_MODEL::collision col2(Vector3f(0, 0, 0), Vector3f(18, 13, 16), Color(126, 92, 173, 86));
+        ENGINE_MODEL::polygon_model pmod(ENGINE_MODEL::model("objects/test.vox"));
+        ENGINE_MODEL::polygon_models.push_back(&pmod);
 
 
 
@@ -175,8 +160,6 @@ namespace ENGINE_MAIN_CYCLE
                     camera.up.x, camera.up.y, camera.up.z);
 
                 ENGINE_RENDERING::draw_coordinates();
-
-                player_col.check(&col2);
 
                 ENGINE_MODEL::render();
                 ENGINE_MODEL::polygon_render();
