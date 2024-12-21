@@ -7,7 +7,7 @@
 #include "CONFIG.hpp"
 
 namespace ENGINE_CONFIG {
-    const string ENGINE_VERSION = "0.21.12.2024";
+    const string ENGINE_VERSION = "0.1.0.0";
     Vector2i WINDOW_RESOLUTION = Vector2i(1920, 1080);
     string WINDOW_NAME = "HET BEST ENGINE v" + ENGINE_VERSION;
     ContextSettings WINDOW_SETTINGS = sf::ContextSettings(24, 8, 0, 4, 6);
